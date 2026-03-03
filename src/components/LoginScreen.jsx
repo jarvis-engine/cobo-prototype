@@ -1,46 +1,45 @@
-import { useEffect } from 'react';
-import { GoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from 'jwt-decode';
+import { useState } from 'react';
 
 const DS = {
   primary: '#7C3AED',
   dark: '#6D28D9',
   light: '#8B5CF6',
+  faint: '#EDE9FE',
   surface: '#FFFFFF',
   text: '#000015',
   secondary: '#595974',
+  border: '#E5E7EB',
 };
 
-export default function LoginScreen({ onLogin, authError, setAuthError }) {
-  const handleSuccess = (credentialResponse) => {
-    try {
-      const decoded = jwtDecode(credentialResponse.credential);
-      const email = decoded.email || '';
+const ACCESS_PASSWORD = 'venginetest';
 
-      if (!email.endsWith('@vengine.tech')) {
-        setAuthError('Nur @vengine.tech Konten sind erlaubt.');
-        return;
-      }
+export default function LoginScreen({ onLogin }) {
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-      const name = decoded.name || email.split('@')[0];
-      onLogin({
-        name,
-        email,
-        role: 'Techniker',
-        company: 'vengine GmbH',
-        language: 'DE',
-        plan: 'Professional',
-        requestsUsed: 0,
-        requestsTotal: 400,
-        avatar: decoded.picture,
-      });
-    } catch {
-      setAuthError('Anmeldung fehlgeschlagen. Bitte erneut versuchen.');
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (!password) { setError('Bitte Passwort eingeben.'); return; }
+    setLoading(true);
+    setError('');
+    await new Promise(r => setTimeout(r, 600));
+    if (password !== ACCESS_PASSWORD) {
+      setError('Falsches Passwort.');
+      setLoading(false);
+      return;
     }
-  };
-
-  const handleError = () => {
-    setAuthError('Google-Anmeldung fehlgeschlagen. Bitte erneut versuchen.');
+    onLogin({
+      name: 'vengine Team',
+      email: 'team@vengine.tech',
+      role: 'Techniker',
+      company: 'vengine GmbH',
+      language: 'DE',
+      plan: 'Professional',
+      requestsUsed: 0,
+      requestsTotal: 400,
+    });
+    setLoading(false);
   };
 
   return (
@@ -69,42 +68,59 @@ export default function LoginScreen({ onLogin, authError, setAuthError }) {
         padding: '40px 48px', width: 420,
         boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
       }}>
-        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 8, color: DS.text }}>Willkommen</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 8, color: DS.text }}>Demo-Zugang</h2>
         <p style={{ fontSize: 14, color: DS.secondary, marginBottom: 28 }}>
-          Melden Sie sich mit Ihrem vengine-Konto an
+          Passwort eingeben, um die Demo zu starten
         </p>
 
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <GoogleLogin
-            onSuccess={handleSuccess}
-            onError={handleError}
-            useOneTap={false}
-            theme="outline"
-            size="large"
-            text="signin_with"
-            locale="de"
-          />
-        </div>
+        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div>
+            <label style={{ fontSize: 13, fontWeight: 500, color: DS.text, display: 'block', marginBottom: 6 }}>Passwort</label>
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="••••••••••••"
+              autoFocus
+              style={{
+                width: '100%', padding: '10px 14px',
+                border: `1px solid ${DS.border}`, borderRadius: 8,
+                fontSize: 14, color: DS.text, outline: 'none',
+                transition: 'border-color 0.2s', fontFamily: 'Inter, sans-serif',
+                boxSizing: 'border-box'
+              }}
+              onFocus={e => e.target.style.borderColor = DS.primary}
+              onBlur={e => e.target.style.borderColor = DS.border}
+            />
+          </div>
 
-        {authError && (
-          <p style={{
-            marginTop: 16, fontSize: 13, color: '#EF4444',
-            background: '#FEF2F2', padding: '8px 12px',
-            borderRadius: 8, border: '1px solid #FECACA',
-            textAlign: 'center'
-          }}>
-            {authError}
-          </p>
-        )}
+          {error && (
+            <p style={{
+              fontSize: 13, color: '#EF4444',
+              background: '#FEF2F2', padding: '8px 12px',
+              borderRadius: 8, border: '1px solid #FECACA', margin: 0
+            }}>
+              {error}
+            </p>
+          )}
 
-        <div style={{
-          marginTop: 24, padding: '10px 14px',
-          background: '#F9FAFB', borderRadius: 8,
-          fontSize: 12, color: DS.secondary, textAlign: 'center',
-          border: '1px solid #E5E7EB'
-        }}>
-          Nur <strong>@vengine.tech</strong> Konten sind zugelassen
-        </div>
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: '100%', padding: '12px',
+              background: loading ? DS.light : DS.primary,
+              color: 'white', border: 'none', borderRadius: 8,
+              fontSize: 15, fontWeight: 600,
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s', fontFamily: 'Inter, sans-serif', marginTop: 4
+            }}
+            onMouseEnter={e => !loading && (e.target.style.background = DS.dark)}
+            onMouseLeave={e => !loading && (e.target.style.background = DS.primary)}
+          >
+            {loading ? 'Einen Moment...' : '→ Demo starten'}
+          </button>
+        </form>
       </div>
 
       <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>
