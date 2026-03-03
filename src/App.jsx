@@ -39,8 +39,9 @@ export default function App() {
   const [activeChatId, setActiveChatId] = useState('new');
   const [chatHistory, setChatHistory] = useState(MOCK_HISTORY);
   const [toast, setToast] = useState(null);
+  const [authError, setAuthError] = useState('');
 
-  const handleLogin = (userData) => setUser(userData);
+  const handleLogin = (userData) => { setAuthError(''); setUser(userData); };
   const handleLogout = () => { setUser(null); setActivePanel('chat'); };
   const handlePanelChange = (panel) => {
     if (panel === 'profile') { setShowProfile(true); return; }
@@ -58,7 +59,7 @@ export default function App() {
 
   const showToast = (msg) => setToast(msg);
 
-  if (!user) return <LoginScreen onLogin={handleLogin} />;
+  if (!user) return <LoginScreen onLogin={handleLogin} authError={authError} setAuthError={setAuthError} />;
 
   const panelTitles = {
     chat: { title:'cobo Chat', subtitle:'KI-gestützter Assistent für Baumaschinen' },
