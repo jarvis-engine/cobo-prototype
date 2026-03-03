@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paslaugų užsakymas | Kurt König</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            orange: { DEFAULT: '#F97316', dark: '#ea6a0a' },
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { background-color: #111111; }
+    input, select, textarea {
+      background-color: #222222;
+      border: 1px solid #333333;
+      color: #f1f1f1;
+      border-radius: 0.5rem;
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.95rem;
+      transition: border-color 0.15s;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #F97316;
+      box-shadow: 0 0 0 2px rgba(249,115,22,0.2);
+    }
+    input::placeholder, textarea::placeholder { color: #555; }
+    select option { background: #222; }
+    label { display: block; margin-bottom: 0.35rem; font-size: 0.85rem; font-weight: 500; color: #d1d1d1; }
+    label .de { color: #555; font-weight: 400; font-size: 0.78rem; margin-left: 4px; }
+    .field-group { margin-bottom: 1.25rem; }
+    .btn-orange {
+      background-color: #F97316;
+      color: white;
+      font-weight: 700;
+      padding: 0.8rem 2rem;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.15s, transform 0.1s;
+      width: 100%;
+    }
+    .btn-orange:hover { background-color: #ea6a0a; }
+    .btn-orange:active { transform: scale(0.98); }
+    #success-state { display: none; }
+  </style>
+</head>
+<body class="min-h-screen font-sans text-white">
+
+  <!-- Header -->
+  <header style="background:#1a1a1a; border-bottom: 1px solid #2a2a2a;">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span style="color:#F97316; font-size:1.5rem;">&#9881;</span>
+        <span class="font-extrabold text-xl tracking-wide text-white">KURT KÖNIG</span>
+      </div>
+      <nav class="hidden md:flex gap-6 text-sm text-gray-400">
+        <a href="#" class="hover:text-white transition">Mašinos</a>
+        <a href="#" class="hover:text-white transition">Paslaugos</a>
+        <a href="#" class="hover:text-white transition" style="color:#F97316;">Paslaugų užsakymas</a>
+        <a href="#" class="hover:text-white transition">Kontaktai</a>
+      </nav>
+      <div class="flex items-center gap-2 text-xs text-gray-500">
+        <span style="border:1px solid #555; border-radius:4px; padding:2px 8px; cursor:pointer; color:#F97316;">LT</span>
+        <span style="border:1px solid #333; border-radius:4px; padding:2px 8px; cursor:pointer;">DE</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero strip -->
+  <div style="background: linear-gradient(135deg, #1a1a1a 0%, #111 100%); border-bottom: 1px solid #222;">
+    <div class="max-w-5xl mx-auto px-6 py-10">
+      <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
+        <a href="#" class="hover:text-white">Paslaugos</a>
+        <span>/</span>
+        <span style="color:#F97316;">Paslaugų užsakymas</span>
+      </div>
+      <h1 class="text-3xl md:text-4xl font-extrabold mb-2">Paslaugų užsakymas</h1>
+      <p class="text-gray-400 text-base max-w-xl">Užpildykite formą žemiau ir mūsų techninė komanda susisieks su jumis per 24 valandas. <span class="text-gray-600">(Serviceanfrage – Techniker meldet sich innerhalb von 24 Stunden.)</span></p>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <main class="max-w-5xl mx-auto px-6 py-10">
+    <div class="grid md:grid-cols-3 gap-8">
+
+      <!-- Form card -->
+      <div class="md:col-span-2">
+        <div style="background:#1a1a1a; border: 1px solid #2a2a2a; border-radius: 1rem; padding: 2rem;">
+
+          <form id="service-form" onsubmit="handleSubmit(event)">
+
+            <div class="mb-6">
+              <h2 class="text-sm font-semibold uppercase tracking-widest mb-4" style="color:#F97316;">Kontaktinė informacija <span class="text-gray-600 normal-case tracking-normal font-normal">/ Kontaktdaten</span></h2>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="field-group">
+                  <label>Vardas <span class="de">/ Vorname</span></label>
+                  <input type="text" placeholder="Vorname" required />
+                </div>
+                <div class="field-group">
+                  <label>Pavardė <span class="de">/ Nachname</span></label>
+                  <input type="text" placeholder="Nachname" required />
+                </div>
+              </div>
+              <div class="field-group">
+                <label>Įmonė <span class="de">/ Unternehmen</span></label>
+                <input type="text" placeholder="Unternehmen" />
+              </div>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="field-group">
+                  <label>El. paštas <span class="de">/ E-Mail</span></label>
+                  <input type="email" placeholder="ihre@email.de" required />
+                </div>
+                <div class="field-group">
+                  <label>Telefonas <span class="de">/ Telefon</span></label>
+                  <input type="tel" placeholder="+370 600 00000" />
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-6">
+              <h2 class="text-sm font-semibold uppercase tracking-widest mb-4" style="color:#F97316;">Mašinos informacija <span class="text-gray-600 normal-case tracking-normal font-normal">/ Maschineninformation</span></h2>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="field-group">
+                  <label>Mašinos tipas <span class="de">/ Maschinentyp</span></label>
+                  <select required>
+                    <option value="" disabled selected>Wählen Sie einen Typ</option>
+                    <option>Bagger / Ekskavatorius</option>
+                    <option>Radlader / Ratinis krautuvas</option>
+                    <option>Bulldozer / Buldozeris</option>
+                    <option>Kompressor / Kompresorius</option>
+                    <option>Sonstige / Kita</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label>Serijos numeris <span class="de">/ Seriennummer</span></label>
+                  <input type="text" placeholder="Seriennummer" />
+                </div>
+              </div>
+              <div class="field-group">
+                <label>Gedimo aprašymas <span class="de">/ Fehlerbeschreibung</span></label>
+                <textarea rows="4" placeholder="Beschreiben Sie das Problem so genau wie möglich..." required></textarea>
+              </div>
+            </div>
+
+            <div class="mb-6">
+              <h2 class="text-sm font-semibold uppercase tracking-widest mb-4" style="color:#F97316;">Planavimas <span class="text-gray-600 normal-case tracking-normal font-normal">/ Terminplanung</span></h2>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="field-group">
+                  <label>Pageidaujama data <span class="de">/ Gewünschter Termin</span></label>
+                  <input type="date" style="color-scheme: dark;" />
+                </div>
+                <div class="field-group">
+                  <label>Mašinos vieta <span class="de">/ Standort der Maschine</span></label>
+                  <input type="text" placeholder="Gatvė, miestas / Straße, Stadt" />
+                </div>
+              </div>
+            </div>
+
+            <!-- DSGVO -->
+            <div class="mb-6 flex items-start gap-3">
+              <input type="checkbox" id="dsgvo" required style="width:1.1rem; height:1.1rem; margin-top:3px; border-radius:4px; accent-color:#F97316; flex-shrink:0; background:#222; border:1px solid #444;" />
+              <label for="dsgvo" style="font-size:0.82rem; color:#999; margin:0; cursor:pointer;">
+                Sutinku su <a href="#" style="color:#F97316;">privatumo politika</a> ir leidžiu tvarkyti pateiktus asmens duomenis paslaugos teikimo tikslais.
+                <span class="block mt-1" style="color:#555;">Ich stimme der <a href="#" style="color:#555;">Datenschutzerklärung</a> zu und erlaube die Verarbeitung meiner personenbezogenen Daten zum Zweck der Serviceerbringung.</span>
+              </label>
+            </div>
+
+            <button type="submit" class="btn-orange">
+              Pateikti užsakymą &nbsp;&#8594;
+              <span class="block text-xs font-normal opacity-70 mt-0.5">Serviceanfrage absenden</span>
+            </button>
+
+          </form>
+
+          <!-- Success state -->
+          <div id="success-state" class="text-center py-8">
+            <div class="text-5xl mb-4">&#10003;</div>
+            <h2 class="text-2xl font-bold mb-2" style="color:#F97316;">Užsakymas pateiktas!</h2>
+            <p class="text-gray-300 mb-1">Ačiū! Susisieksime su jumis per 24 valandas.</p>
+            <p class="text-gray-600 text-sm">Vielen Dank! Unser Techniker meldet sich innerhalb von 24 Stunden.</p>
+            <button onclick="resetForm()" class="mt-6 text-sm" style="color:#F97316; background:none; border:none; cursor:pointer;">&#8592; Grįžti / Zurück</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="md:col-span-1 flex flex-col gap-4">
+
+        <div style="background:#1a1a1a; border: 1px solid #2a2a2a; border-radius:1rem; padding:1.5rem;">
+          <h3 class="font-bold mb-3 text-sm uppercase tracking-wider" style="color:#F97316;">Kontaktai</h3>
+          <div class="text-sm text-gray-400 space-y-2">
+            <div>&#128222; <a href="tel:+4917600000000" class="hover:text-white">+49 176 000 00000</a></div>
+            <div>&#9993; <a href="mailto:service@kurt-koenig.com" class="hover:text-white">service@kurt-koenig.com</a></div>
+            <div>&#128336; Mo–Fr: 07:00–17:00</div>
+          </div>
+        </div>
+
+        <div style="background:#1a1a1a; border: 1px solid #2a2a2a; border-radius:1rem; padding:1.5rem;">
+          <h3 class="font-bold mb-3 text-sm uppercase tracking-wider" style="color:#F97316;">Kaip tai veikia</h3>
+          <ol class="text-sm text-gray-400 space-y-3">
+            <li class="flex gap-2"><span style="color:#F97316; font-weight:700;">1.</span><span>Užpildykite formą</span></li>
+            <li class="flex gap-2"><span style="color:#F97316; font-weight:700;">2.</span><span>Technikas susisieks per 24 val.</span></li>
+            <li class="flex gap-2"><span style="color:#F97316; font-weight:700;">3.</span><span>Suderinamas vizito laikas</span></li>
+            <li class="flex gap-2"><span style="color:#F97316; font-weight:700;">4.</span><span>Gedimas pašalinamas vietoje</span></li>
+          </ol>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #1c1008, #1a1a1a); border: 1px solid #3a2010; border-radius:1rem; padding:1.5rem;">
+          <div class="text-2xl mb-2">&#128295;</div>
+          <h3 class="font-bold mb-1 text-sm">Avarinis iškvietimas</h3>
+          <p class="text-xs text-gray-500 mb-3">Notdienst 24/7 für kritische Maschinenausfälle</p>
+          <a href="tel:+4917600000000" class="text-sm font-semibold" style="color:#F97316;">&#8594; Skambinti dabar</a>
+        </div>
+
+        <div class="text-xs text-gray-600 text-center pt-2">
+          &#128274; Duomenys saugomi pagal DSGVO<br/>Daten werden DSGVO-konform verarbeitet
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer style="border-top: 1px solid #1e1e1e; margin-top: 3rem; padding: 1.5rem 0;">
+    <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-xs text-gray-600 gap-2">
+      <span>&#169; 2024 Kurt König GmbH &amp; Co. KG — Alle Rechte vorbehalten</span>
+      <div class="flex gap-4">
+        <a href="#" class="hover:text-gray-400">Impressum</a>
+        <a href="#" class="hover:text-gray-400">Datenschutz</a>
+        <a href="#" class="hover:text-gray-400">AGB</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function handleSubmit(e) {
+      e.preventDefault();
+      document.getElementById('service-form').style.display = 'none';
+      document.getElementById('success-state').style.display = 'block';
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+    function resetForm() {
+      document.getElementById('service-form').style.display = 'block';
+      document.getElementById('success-state').style.display = 'none';
+      document.getElementById('service-form').reset();
+    }
+  </script>
+
+</body>
+</html>
